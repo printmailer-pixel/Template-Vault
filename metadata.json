@@ -1,0 +1,6 @@
+{
+  "name": "Template Vault",
+  "description": "Real Estate Template Vault",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
