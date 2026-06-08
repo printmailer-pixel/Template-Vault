@@ -1,20 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# RE-Vault
 
-# Run and deploy your AI Studio app
+A Real Estate Template Vault application for managing and quickly sending out real estate communication templates.
 
-This contains everything you need to run your app locally.
+## Features
+- **Targeted Search**: Filter templates by Title, Subject, or Final Message.
+- **Expandable Feed**: View truncated template previews and expand to read the full content.
+- **One-Tap Copy**: Easily copy templates to your device clipboard.
+- **Custom Templates**: Add your own custom templates which are saved directly to your local browser storage.
+- **Quick Send Options**: Instantly send templates via WhatsApp, Email, or SMS to your clients directly from the app.
 
-View your app in AI Studio: https://ai.studio/apps/997bf7a5-9fe3-4fe7-aa66-bfba8ec56482
+## Tech Stack
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Deployment
+This project is configured to be automatically deployed via GitHub Pages using the provided GitHub Actions workflow. Ensure that GitHub Pages is enabled in your repository settings and set to deploy from GitHub Actions.
