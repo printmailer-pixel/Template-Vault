@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Template, SearchTab, SyncSettings } from './types';
-import { fetchSheetTemplates, getLocalTemplates, saveLocalTemplates, classNames, getSyncSettings, saveSyncSettings } from './utils';
+import { Template, SearchTab } from './types';
+import { fetchSheetTemplates, getLocalTemplates, saveLocalTemplates, classNames } from './utils';
 import { TemplateCard } from './components/TemplateCard';
 import { AddEditModal } from './components/AddEditModal';
 import { SendModal } from './components/SendModal';
-import { SettingsModal } from './components/SettingsModal';
-import { Search, Plus, Loader2, Check, Settings, AlertCircle, Shield, Key } from 'lucide-react';
+import { Search, Plus, Loader2, Check } from 'lucide-react';
 
 export default function App() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -13,12 +12,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTab, setSearchTab] = useState<SearchTab>('Title');
   
-  // Settings sync state
-  const [settings, setSettings] = useState<SyncSettings>(getSyncSettings());
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [activeGmail, setActiveGmail] = useState<string | null>(null);
-  const [syncError, setSyncError] = useState<string | null>(null);
-
   // Modals state
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
@@ -32,27 +25,17 @@ export default function App() {
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
 
   useEffect(() => {
-    loadData(settings);
+    loadData();
   }, []);
 
-  const loadData = async (currentSettings: SyncSettings) => {
+  const loadData = async () => {
     setLoading(true);
-    setSyncError(null);
     try {
-      const result = await fetchSheetTemplates(currentSettings);
+      const sheetTemplates = await fetchSheetTemplates();
       const localTemplates = getLocalTemplates();
-      setTemplates([...localTemplates, ...result.templates]);
-      if (result.email) {
-        setActiveGmail(result.email);
-      } else {
-        setActiveGmail(null);
-      }
-      if (result.error) {
-        setSyncError(result.error);
-      }
-    } catch (error: any) {
+      setTemplates([...localTemplates, ...sheetTemplates]);
+    } catch (error) {
       console.error("Failed to fetch templates:", error);
-      setSyncError(error?.message || 'An unexpected error occurred during templates synchronization.');
       setTemplates(getLocalTemplates());
     } finally {
       setLoading(false);
@@ -143,23 +126,10 @@ export default function App() {
             <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800">RE-Vault <span className="text-sm font-normal text-slate-400 ml-1">v1.5</span></h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-800">RE-Vault <span className="text-sm font-normal text-slate-400 ml-2">v1.4</span></h1>
           </div>
-          <div className="flex items-center space-x-2">
-            {settings.mode === 'private' && (
-              <div className="hidden sm:flex items-center space-x-1 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-xl text-[10px] font-bold text-indigo-700 max-w-[150px]">
-                <Shield className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                <span className="truncate">{activeGmail || 'Authorized'}</span>
-              </div>
-            )}
-            <button
-              onClick={() => setIsSettingsModalOpen(true)}
-              className="p-2 text-slate-500 hover:text-indigo-650 hover:bg-slate-50 border border-slate-200 rounded-xl transition-all"
-              title="Access & Sync Settings"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-            <div className="hidden md:flex text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">{templates.length}</div>
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">{templates.length} TEMPLATES</div>
           </div>
         </header>
 
@@ -199,37 +169,7 @@ export default function App() {
         </div>
 
         {/* Content */}
-        <div className="p-4 flex-grow pb-24 animate-fade-in">
-          
-          {/* Active Error Notice */}
-          {syncError && (
-            <div className="mb-4 p-4 border border-rose-100 bg-rose-50/60 rounded-2xl flex items-start space-x-3">
-              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-              <div className="flex-grow space-y-2">
-                <div className="text-xs font-bold text-rose-800 uppercase tracking-wide">Secure sync failure</div>
-                <p className="text-xs text-rose-700 leading-relaxed whitespace-pre-line">{syncError}</p>
-                <div className="flex items-center space-x-3 pt-1">
-                  <button
-                    onClick={() => setIsSettingsModalOpen(true)}
-                    className="text-xs font-bold text-slate-700 hover:bg-slate-200 inline-flex items-center space-x-1.5 bg-slate-100 px-3 py-1.5 rounded-lg transition-all"
-                  >
-                    <span>Configure Connection settings</span>
-                  </button>
-                  {settings.mode === 'private' && settings.webAppUrl && (
-                    <a
-                      href={settings.webAppUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-bold text-white bg-indigo-650 hover:bg-indigo-700 px-3 py-1.5 rounded-lg inline-flex items-center space-x-1"
-                    >
-                      <span>Authorize Google Connection</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
+        <div className="p-4 flex-grow pb-24">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-48 text-gray-400">
               <Loader2 className="w-8 h-8 animate-spin mb-4" />
@@ -287,23 +227,6 @@ export default function App() {
           onClose={() => setSendModalState(prev => ({ ...prev, isOpen: false }))}
           template={sendModalState.template}
           method={sendModalState.method}
-        />
-
-        <SettingsModal
-          isOpen={isSettingsModalOpen}
-          onClose={() => {
-            setIsSettingsModalOpen(false);
-            // Refresh settings in case they updated them
-            const fresh = getSyncSettings();
-            setSettings(fresh);
-            loadData(fresh);
-          }}
-          settings={settings}
-          onSave={(newSettings) => {
-            saveSyncSettings(newSettings);
-            setSettings(newSettings);
-            loadData(newSettings);
-          }}
         />
 
         {/* Toast Notification */}

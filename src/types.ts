@@ -7,10 +7,3 @@ export interface Template {
 }
 
 export type SearchTab = 'Title' | 'Subject' | 'Message';
-
-export interface SyncSettings {
-  mode: 'public' | 'private';
-  publicCsvUrl: string;
-  webAppUrl: string;
-}
-
