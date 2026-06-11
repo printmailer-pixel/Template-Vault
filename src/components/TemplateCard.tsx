@@ -11,7 +11,7 @@ interface TemplateCardProps {
   onSend: (template: Template, method: 'whatsapp' | 'email' | 'sms') => void;
 }
 
-export function TemplateCard({ template, onCopy, onEdit, onDelete, onSend }: TemplateCardProps) {
+export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onCopy, onEdit, onDelete, onSend }) => {
   const [expanded, setExpanded] = useState(false);
 
   if (!expanded) {
@@ -21,13 +21,18 @@ export function TemplateCard({ template, onCopy, onEdit, onDelete, onSend }: Tem
         className="group bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 transition-all cursor-pointer relative"
       >
         <div className="flex justify-between items-start">
-          <div className="space-y-1 pr-4">
+          <div className="space-y-1 pr-4 flex-1">
             <span className={classNames(
               "text-[10px] font-bold uppercase tracking-widest block",
               template.source === 'local' ? "text-indigo-500" : "text-emerald-500"
             )}>
               {template.source === 'local' ? 'Custom' : 'Vault'}
             </span>
+            {template.subject && (
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                Subject: {template.subject}
+              </div>
+            )}
             <h3 className="text-base font-bold text-slate-800">{template.title || 'Untitled'}</h3>
           </div>
           <button 

@@ -138,7 +138,7 @@ export default function App() {
           <div className="space-y-4">
             {/* Filter Tabs */}
             <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
-              {(['Title', 'Subject', 'Final Message'] as SearchTab[]).map(tab => (
+              {(['Title', 'Subject', 'Message'] as SearchTab[]).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setSearchTab(tab)}

@@ -6,4 +6,4 @@ export interface Template {
   source: 'sheet' | 'local';
 }
 
-export type SearchTab = 'Title' | 'Subject' | 'Final Message';
+export type SearchTab = 'Title' | 'Subject' | 'Message';

@@ -24,7 +24,7 @@ export async function fetchSheetTemplates(): Promise<Template[]> {
             message: row[messageKey]?.trim() || '',
             source: 'sheet' as const
           };
-        }).filter(t => t.title || t.subject || t.message);
+        }).filter(t => t.title);
         resolve(templates);
       },
       error: (error) => {
