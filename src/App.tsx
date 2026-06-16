@@ -474,7 +474,11 @@ export default function App() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchTab, setSearchTab] = useState<SearchTab>('Title');
+  const [searchFields, setSearchFields] = useState<Record<SearchTab, boolean>>({
+    Title: true,
+    Subject: true,
+    Message: false
+  });
   
   // Modals state
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
@@ -570,19 +574,13 @@ export default function App() {
     const query = searchQuery.toLowerCase();
     
     return templates.filter(template => {
-      const tTitle = (template.title || '').toLowerCase();
-      const tSubject = (template.subject || '').toLowerCase();
-      const tMessage = (template.message || '').toLowerCase();
+      const matchTitle = searchFields.Title && (template.title || '').toLowerCase().includes(query);
+      const matchSubject = searchFields.Subject && (template.subject || '').toLowerCase().includes(query);
+      const matchMessage = searchFields.Message && (template.message || '').toLowerCase().includes(query);
 
-      if (searchTab === 'Title') {
-        return tTitle.includes(query);
-      } else if (searchTab === 'Subject') {
-        return tSubject.includes(query);
-      } else {
-        return tMessage.includes(query);
-      }
+      return matchTitle || matchSubject || matchMessage;
     });
-  }, [templates, searchQuery, searchTab]);
+  }, [templates, searchQuery, searchFields]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex justify-center w-full">
@@ -605,16 +603,16 @@ export default function App() {
         <div className="bg-white border-b border-slate-200 px-4 md:px-8 py-6 shrink-0 shadow-sm sticky top-[72px] z-20">
           <div className="space-y-4">
             {/* Filter Tabs */}
-            <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
+            <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit overflow-x-auto gap-1">
               {(['Title', 'Subject', 'Message'] as SearchTab[]).map(tab => (
                 <button
                   key={tab}
-                  onClick={() => setSearchTab(tab)}
+                  onClick={() => setSearchFields(prev => ({ ...prev, [tab]: !prev[tab] }))}
                   className={classNames(
-                    "flex-1 sm:flex-none px-4 md:px-6 py-2 rounded-lg text-sm transition-colors whitespace-nowrap",
-                    searchTab === tab 
-                      ? "bg-white text-indigo-600 shadow-sm font-bold" 
-                      : "text-slate-500 hover:text-slate-700 font-semibold"
+                    "flex-1 sm:flex-none px-4 md:px-6 py-2 rounded-lg text-sm transition-all whitespace-nowrap",
+                    searchFields[tab]
+                      ? "bg-white text-indigo-600 shadow-sm font-bold ring-1 ring-slate-200/50" 
+                      : "text-slate-500 hover:text-slate-700 font-semibold hover:bg-slate-200/50"
                   )}
                 >
                   {tab}
@@ -628,7 +626,7 @@ export default function App() {
               <input
                 type="text"
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg"
-                placeholder={`Search within ${searchTab.toLowerCase()}...`}
+                placeholder="Search templates..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
